@@ -38,33 +38,23 @@ if __name__ == '__main__':
     base_url = "https://chat-ai.academiccloud.de/v1"
     model = "meta-llama-3.1-70b-instruct"  # Choose any available model
 
-    # Start OpenAI client
     client = OpenAI(
         api_key=api_key,
         base_url=base_url
     )
 
-    # Get response
-    #chat_completion = client.chat.completions.create(messages=[{"role": "system", "content": "You are a helpful assistant"},{"role":"user","content":"How tall is the Eiffel tower?"}],model = model)
-
     
-    #print(vectorstore.docstore._dict.values())
-    #vectorstore.docstore.values()
     
     filepath = "H:\\Uni\\BSI_Lektion_Ground_Truth.CSV"
     with open(filepath, mode='r') as file:
-        # Create a CSV reader with DictReader
+        
         csv_reader = csv.DictReader(file, delimiter="|")
 
-        # Initialize an empty list to store the dictionaries
         data_list = []
-
-        # Iterate through each row in the CSV file
         for row in csv_reader:
-            # Append each row (as a dictionary) to the list
             data_list.append(row)
 
-    # Print the list of dictionaries
+
     for data in data_list[:3]:
         print(data)
         data["Context"]=None
@@ -81,29 +71,21 @@ if __name__ == '__main__':
     with open('H:\\Uni\\outputfile', 'w') as fout:
         json.dump(data_list, fout)
         
-    # Print full response as JSON
-    #print("INHALT:"+chat_completion.choices[0].message.content)
 
 
-
-    # CSV-Datei erstellen
-    # CSV-Datei erstellen
     def export_quiz_to_csv(data, output_file):
         try:
             with open(output_file, mode='w', encoding='utf-8', newline='') as file:
                 writer = csv.writer(file, delimiter='|')
 
-                # Header schreiben
                 writer.writerow(['Frage', 'Antwortmöglichkeiten', 'Korrekt'])
 
-                # Quiz-Daten durchlaufen
                 for section, questions in data['quiz'].items():
                     for qid, details in questions.items():
                         frage = details['question']
                         antworten = " | ".join([f"{key}: {value}" for key, value in details['answers'].items()])
                         korrekt = ", ".join(details['right'])
 
-                        # Zeile schreiben
                         writer.writerow([frage, antworten, korrekt])
             print(f'Die CSV-Datei wurde erstellt: {output_file}')
         except Exception as e:
@@ -112,19 +94,16 @@ if __name__ == '__main__':
     def loadJSON():
         dataset = "H:\\Uni\\Master\\Masterarbeit\\testSAIAApi\\docs\\_eval\\dataset.json"
 
-        # Überprüfen, ob die Datei existiert
         if not os.path.exists(dataset):
             print(f"Fehler: Die Datei {dataset} existiert nicht.")
         else:
             try:
-                # Datei öffnen und JSON-Inhalt einlesen
                 with open(dataset, encoding='latin1') as f:
                     content = f.read().strip()
                     if not content:
                         raise ValueError("Die Datei ist leer.")
                     dataset = json.loads(content)
 
-                # Gewünschte Struktur erstellen
                 data_samples = {
                     'question': [],
                     'answer': [],
@@ -132,14 +111,12 @@ if __name__ == '__main__':
                     'ground_truth': []
                 }
 
-                # Daten in das neue Format übertragen
                 for item in dataset:
                     data_samples['question'].append(item['Frage'])
                     data_samples['answer'].append(item['Answer'])
                     data_samples['contexts'].append(item['Context'].split('The Document is'))  # Kontext in eine Liste aufteilen
                     data_samples['ground_truth'].append(item['Ground_truth'])
 
-                # Ergebnis ausgeben
                 #print("Umgewandelte Datenstruktur:")
                 #print(json.dumps(data_samples, indent=4))  # Formatiertes JSON ausgeben
                 return data_samples
@@ -155,7 +132,6 @@ if __name__ == '__main__':
     dataset = Dataset.from_dict(data)
 
     #generator_llm = LangchainLLMWrapper(ChatOpenAI(model="gpt-4o-mini"))
-    # Funktion ausführen
     print (faithfulness)
     embedding_model = HuggingFaceEmbeddings(
         model_name="H:\\Uni\\Master\\Masterarbeit\\Masterarbeit\\Models\\multilingual-e5-large-instruct")
@@ -170,7 +146,6 @@ if __name__ == '__main__':
     # Start OpenAI client
     #openai.api_base = base_url
     openai.api_base = "https://api.openai.com/v1/"
-    #EMbeddings hinzufügen ...?
     conf = RunConfig(max_retries = 30, max_wait = 300, max_workers=2, timeout=300)
     #metrics = [faithfulness, answer_relevancy, context_precision,context_recall]
     #init_ragas_metrics(metrics, llm=eval_model, embedding=embedding_model)
